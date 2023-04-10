@@ -1,0 +1,63 @@
+.CurrencyInput {
+  position: relative;
+  padding: 0.5rem;
+  outline: none;
+  z-index: 1;
+  background-color: transparent;
+  border: none;
+  &-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    align-items: center;
+    border: 1px solid tomato;
+  }
+  &-wrap {
+    position: relative;
+  }
+  &-control {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+  }
+  &-select {
+    width: 1.5rem;
+    height: 1.5rem;
+    margin-right: 0.15rem;
+  }
+  &-currency {
+  }
+  &-menu {
+    position: absolute;
+    top: 115%;
+    left: 0;
+    width: 100%;
+    background-color: rgb(212, 208, 203);
+    padding: 1rem;
+    max-height: 300px;
+    overflow: auto;
+  }
+  &-menu-item {
+    display: block;
+    padding: 0.5rem;
+    font-size: 1rem;
+    cursor: pointer;
+
+    &:hover {
+      background-color: tomato;
+    }
+  }
+  &-localization {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: white;
+    outline: none;
+    border: none;
+    padding: 0.5rem;
+    z-index: 2;
+    pointer-events: none;
+  }
+}
