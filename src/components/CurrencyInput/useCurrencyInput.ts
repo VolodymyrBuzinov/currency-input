@@ -25,15 +25,6 @@ export const useCurrencyInput = () => {
     getSymbolAndCentsSeparator();
   }, []);
 
-  useEffect(() => {
-    //api call to get data from
-    let backendValue = 0;
-
-    if (isNaN(Number(backendValue)) || !Number(backendValue)) backendValue = 0;
-
-    setVal(backendValue.toString());
-  }, []);
-
   const getSymbolAndCentsSeparator = () => {
     const formatter = new Intl.NumberFormat("en-US", {
       style: "currency",
@@ -63,16 +54,10 @@ export const useCurrencyInput = () => {
 
     if (onlySeparator) return (newVal = `0${centsSeparator}`);
 
-    if (separatorIndex + 1 === newVal.length) return newVal;
+    if (separatorIndex + 1 === newVal.length || nextElementAfterSeparator)
+      return newVal;
 
-    const formatter = Intl.NumberFormat("en-US", {
-      maximumFractionDigits: 2,
-      minimumFractionDigits: 0,
-    });
-
-    // debug elements count and element after separator
-
-    // debug when separator is on the middle of a string
+    const formatter = Intl.NumberFormat("en-US");
 
     const localizedValue = formatter.format(Number(newVal.replace(/\D/g, "")));
 
@@ -90,6 +75,18 @@ export const useCurrencyInput = () => {
         target.selectionStart = selectionStart;
         target.selectionEnd = selectionStart;
       });
+
+    const regex = RegExp(`[^\\d/${centsSeparator}]`, "g");
+
+    const newVal = value.replace(regex, "");
+    const separatorIndex = value.indexOf(centsSeparator);
+
+    const maxLength = newVal.indexOf(centsSeparator) + 4;
+    const separatorCount = newVal.match(/\./g);
+
+    if (!!separatorCount && separatorCount.length > 1) return;
+
+    if (separatorIndex >= 1 && maxLength === newVal.length) return;
 
     setVal(value);
   };
