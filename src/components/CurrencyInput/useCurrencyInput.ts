@@ -1,95 +1,109 @@
-import { useState } from "react";
-import { iCurrency } from "./currenciesData";
+import { useEffect, useState } from "react";
+
+export const currencies = ["EUR", "JPY", "PLN", "GBP", "CHF", "UAH", "USD"];
+
+export const locales = [
+  "de",
+  "ja-JP",
+  "pl",
+  "en-GB",
+  "fr-CH",
+  "uk-UA",
+  "en-US",
+];
 
 export const useCurrencyInput = () => {
-  const [currency, setCurrency] = useState<iCurrency>({
-    name: "US Dollars",
-    iso: "USD",
-    number_decimals: 2,
-    symbols: {
-      primary: "US$",
-      narrow: "$",
-    },
-    default_locale: "en-US",
-  });
-
+  // const [locale, setLocale] = useState("en-US");
+  // const [currency, setCurrency] = useState("USD");
   const [showMenu, setShowMenu] = useState(false);
   const [val, setVal] = useState("0");
+  const [centsSeparator, setCentsSeparator] = useState("");
+  const [currencySymbol, setCurrencySymbol] = useState("$");
+  //refactor locales , two selects for locales and second for currency
+
+  useEffect(() => {
+    getSymbolAndCentsSeparator();
+  }, []);
+
+  useEffect(() => {
+    //api call to get data from
+    let backendValue = 0;
+
+    if (isNaN(Number(backendValue)) || !Number(backendValue)) backendValue = 0;
+
+    setVal(backendValue.toString());
+  }, []);
+
+  const getSymbolAndCentsSeparator = () => {
+    const formatter = new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+    });
+    const symbolOnly = formatter
+      .formatToParts(1111)
+      .filter((item) => item.type === "currency");
+
+    const separator = formatter
+      .format(1.11)
+      .replace(/1/g, "")
+      .replace(symbolOnly[0]?.value, "");
+
+    setCentsSeparator(separator);
+
+    setCurrencySymbol(symbolOnly[0]?.value);
+  };
 
   const makeLocaleString = (val: string) => {
     let newVal = val;
-    const dotIndex = newVal.indexOf(".");
-    const onlyDot = dotIndex === 0 && newVal.length === 1;
-    const nextElementAfterDot =
-      dotIndex >= 0 ? newVal[dotIndex + 1] : undefined;
 
-    if (onlyDot) return (newVal = "0.");
+    const separatorIndex = newVal.indexOf(centsSeparator);
+    const onlySeparator = separatorIndex === 0 && newVal.length === 1;
+    const nextElementAfterSeparator =
+      separatorIndex >= 0 ? newVal[separatorIndex + 1] : "";
 
-    if (dotIndex >= 1 || !!nextElementAfterDot) return newVal;
+    if (onlySeparator) return (newVal = `0${centsSeparator}`);
 
-    const formattedValue = getLocaleString(newVal);
+    if (separatorIndex + 1 === newVal.length) return newVal;
 
-    return formattedValue;
-  };
-
-  const getLocaleString = (value: string) => {
-    const parsedVal = parseLocaleString(value);
-
-    const formatter = Intl.NumberFormat(currency.default_locale, {
+    const formatter = Intl.NumberFormat("en-US", {
       maximumFractionDigits: 2,
+      minimumFractionDigits: 0,
     });
 
-    return formatter.format(Number(parsedVal));
+    // debug elements count and element after separator
+
+    // debug when separator is on the middle of a string
+
+    const localizedValue = formatter.format(Number(newVal.replace(/\D/g, "")));
+
+    return localizedValue;
   };
 
-  const parseLocaleString = (val: string) => {
-    let newVal = val;
-    const decimalSeparator = new Intl.NumberFormat(currency.default_locale, {
-      maximumFractionDigits: 2,
-    })
-      .format(1111)
-      .replace(/1/g, "");
-
-    newVal = val.replace(new RegExp("\\" + decimalSeparator, "gm"), "");
-
-    return newVal;
-  };
-
-  const validValue = (val: string) =>
-    new RegExp(/^(0|[0-9]+)?(\.)?([0-9]{1,2})?$/gm).test(val);
-
-  const handleBLur = () => setVal(getLocaleString(val));
+  // const handleBLur = () => setVal(getLocaleString(val));
 
   const onChange = ({ target }: React.ChangeEvent<HTMLInputElement>) => {
     const value = target.value;
     const selectionStart = target.selectionStart;
     const selectionEnd = target.selectionEnd;
-    if (value.length !== selectionEnd) {
+    if (value.length !== selectionEnd)
       window.requestAnimationFrame(() => {
         target.selectionStart = selectionStart;
         target.selectionEnd = selectionStart;
       });
-    }
-    const parsedVal = parseLocaleString(value);
-    if (!validValue(parsedVal.toString())) return;
-    setVal(value);
-  };
 
-  const onSelect = (item: iCurrency) => {
-    setShowMenu(false);
-    setCurrency(item);
+    setVal(value);
   };
 
   return {
     onChange,
     val,
     setVal,
-    currency,
-    setCurrency,
+    // currency,
+    // setCurrency,
     showMenu,
     setShowMenu,
-    onSelect,
     makeLocaleString,
-    handleBLur,
+    currencySymbol,
+    // handleBLur,
   };
 };

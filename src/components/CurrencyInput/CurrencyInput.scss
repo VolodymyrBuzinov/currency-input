@@ -14,8 +14,9 @@
     align-items: center;
     border: 1px solid tomato;
   }
-  &-wrap {
-    position: relative;
+  &-symbol {
+    margin: 0;
+    padding-left: 1rem;
   }
   &-control {
     display: flex;
