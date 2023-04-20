@@ -19,6 +19,7 @@ export const useCurrencyInput = () => {
   const [val, setVal] = useState("0");
   const [centsSeparator, setCentsSeparator] = useState("");
   const [currencySymbol, setCurrencySymbol] = useState("$");
+  const [groupSeparator, setGroupSeparator] = useState("");
   //refactor locales , two selects for locales and second for currency
 
   useEffect(() => {
@@ -30,18 +31,12 @@ export const useCurrencyInput = () => {
       style: "currency",
       currency: "USD",
     });
-    const symbolOnly = formatter
-      .formatToParts(1111)
-      .filter((item) => item.type === "currency");
 
-    const separator = formatter
-      .format(1.11)
-      .replace(/1/g, "")
-      .replace(symbolOnly[0]?.value, "");
-
-    setCentsSeparator(separator);
-
-    setCurrencySymbol(symbolOnly[0]?.value);
+    formatter.formatToParts(11111).forEach((item) => {
+      item.type === "currency" && setCurrencySymbol(item.value);
+      item.type === "decimal" && setCentsSeparator(item.value);
+      item.type === "group" && setGroupSeparator(item.value);
+    });
   };
 
   const makeLocaleString = (val: string) => {
@@ -64,7 +59,7 @@ export const useCurrencyInput = () => {
     return localizedValue;
   };
 
-  // const handleBLur = () => setVal(getLocaleString(val));
+  const handleBLur = () => setVal(makeLocaleString(val));
 
   const onChange = ({ target }: React.ChangeEvent<HTMLInputElement>) => {
     const value = target.value;
@@ -76,13 +71,17 @@ export const useCurrencyInput = () => {
         target.selectionEnd = selectionStart;
       });
 
-    const regex = RegExp(`[^\\d/${centsSeparator}]`, "g");
-
-    const newVal = value.replace(regex, "");
+    const regex = RegExp(`[^\\d\\${centsSeparator}\\${groupSeparator}]`, "g");
     const separatorIndex = value.indexOf(centsSeparator);
-
+    const newVal = value.replace(regex, "");
     const maxLength = newVal.indexOf(centsSeparator) + 4;
     const separatorCount = newVal.match(/\./g);
+
+    const doubleGroupSeparator = RegExp(`[\\${groupSeparator}]{2,}`, "g");
+
+    if (!!value.match(doubleGroupSeparator)?.length) return;
+
+    if (regex.test(value)) return;
 
     if (!!separatorCount && separatorCount.length > 1) return;
 
@@ -101,6 +100,6 @@ export const useCurrencyInput = () => {
     setShowMenu,
     makeLocaleString,
     currencySymbol,
-    // handleBLur,
+    handleBLur,
   };
 };

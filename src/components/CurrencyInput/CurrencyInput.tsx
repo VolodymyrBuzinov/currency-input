@@ -6,11 +6,10 @@ export const CurrencyInput: FC = () => {
   const {
     val,
     onChange,
-    // currency,
-    showMenu,
     setShowMenu,
     makeLocaleString,
     currencySymbol,
+    handleBLur,
   } = useCurrencyInput();
   const wrapRef: MutableRefObject<HTMLDivElement | null> = useRef(null);
   useOnClickOutside(wrapRef, () => setShowMenu(false));
@@ -23,7 +22,7 @@ export const CurrencyInput: FC = () => {
         className="CurrencyInput"
         type="text"
         onChange={onChange}
-        // onBlur={handleBLur}
+        onBlur={handleBLur}
       />
     </div>
   );
