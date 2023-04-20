@@ -1,22 +1,32 @@
+body {
+  background-color: rgb(59, 170, 214);
+}
+
 .CurrencyInput {
   position: relative;
-  padding: 0.5rem;
+  padding: 1rem 2rem;
   outline: none;
   z-index: 1;
   background-color: transparent;
   border: none;
-  &-content {
+  color: white;
+  font-size: 1.25rem;
+  &-wrap {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+  }
+  &-content {
     display: flex;
     align-items: center;
-    border: 1px solid tomato;
+    border: 2px solid white;
   }
   &-symbol {
     margin: 0;
     padding-left: 1rem;
+    color: white;
+    font-size: 1.5rem;
   }
   &-control {
     display: flex;
@@ -28,8 +38,7 @@
     height: 1.5rem;
     margin-right: 0.15rem;
   }
-  &-currency {
-  }
+
   &-menu {
     position: absolute;
     top: 115%;

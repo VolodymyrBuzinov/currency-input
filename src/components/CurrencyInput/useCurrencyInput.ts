@@ -13,21 +13,21 @@ export const locales = [
 ];
 
 export const useCurrencyInput = () => {
-  // const [locale, setLocale] = useState("en-US");
-  // const [currency, setCurrency] = useState("USD");
+  const [locale, setLocale] = useState("en-US");
+  const [currency, setCurrency] = useState("USD");
   const [val, setVal] = useState("0");
   const [centsSeparator, setCentsSeparator] = useState("");
-  const [currencySymbol, setCurrencySymbol] = useState("$");
+  const [currencySymbol, setCurrencySymbol] = useState("");
   const [groupSeparator, setGroupSeparator] = useState("");
 
   useEffect(() => {
     getSymbolAndCentsSeparator();
-  }, []);
+  }, [currency]);
 
   const getSymbolAndCentsSeparator = () => {
-    const formatter = new Intl.NumberFormat("uk-UA", {
+    const formatter = new Intl.NumberFormat(locale, {
       style: "currency",
-      currency: "USD",
+      currency: currency,
     });
 
     formatter.formatToParts(11111).forEach((item) => {
@@ -46,7 +46,7 @@ export const useCurrencyInput = () => {
 
     if (onlySeparator) return `0${centsSeparator}`;
 
-    const formatter = Intl.NumberFormat("uk-UA");
+    const formatter = Intl.NumberFormat(locale);
 
     const localizedValue = formatter.format(
       Number(splittedVal?.[0].replace(/\D/g, ""))
@@ -61,11 +61,12 @@ export const useCurrencyInput = () => {
   };
 
   const handleBLur = () => {
-    // setVal(
-    //   Intl.NumberFormat("uk-UA").format(
-    //     Number(val.replace(RegExp(`[\\D\\${centsSeparator}]`, "g"), ""))
-    //   )
-    // );
+    const newVal = Number(
+      val
+        .replace(RegExp(`\\${centsSeparator}`), ".")
+        .replace(RegExp(`[^\\d\\.]`, "g"), "")
+    );
+    setVal(Intl.NumberFormat(locale).format(newVal));
   };
 
   const onChange = ({ target }: React.ChangeEvent<HTMLInputElement>) => {
@@ -99,10 +100,12 @@ export const useCurrencyInput = () => {
     onChange,
     val,
     setVal,
-    // currency,
-    // setCurrency,
     makeLocaleString,
     currencySymbol,
     handleBLur,
+    locale,
+    setLocale,
+    currency,
+    setCurrency,
   };
 };
