@@ -1,21 +1,12 @@
-import { useOnClickOutside } from "hooks/useOnCLickOutside";
-import { FC, MutableRefObject, useRef } from "react";
+import { FC } from "react";
 import { useCurrencyInput } from "./useCurrencyInput";
 
 export const CurrencyInput: FC = () => {
-  const {
-    val,
-    onChange,
-    setShowMenu,
-    makeLocaleString,
-    currencySymbol,
-    handleBLur,
-  } = useCurrencyInput();
-  const wrapRef: MutableRefObject<HTMLDivElement | null> = useRef(null);
-  useOnClickOutside(wrapRef, () => setShowMenu(false));
+  const { val, onChange, makeLocaleString, currencySymbol, handleBLur } =
+    useCurrencyInput();
 
   return (
-    <div className="CurrencyInput-content" ref={wrapRef}>
+    <div className="CurrencyInput-content">
       <p className="CurrencyInput-symbol">{currencySymbol}</p>
       <input
         value={makeLocaleString(val)}

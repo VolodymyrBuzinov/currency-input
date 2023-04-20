@@ -15,12 +15,10 @@ export const locales = [
 export const useCurrencyInput = () => {
   // const [locale, setLocale] = useState("en-US");
   // const [currency, setCurrency] = useState("USD");
-  const [showMenu, setShowMenu] = useState(false);
   const [val, setVal] = useState("0");
   const [centsSeparator, setCentsSeparator] = useState("");
   const [currencySymbol, setCurrencySymbol] = useState("$");
   const [groupSeparator, setGroupSeparator] = useState("");
-  //refactor locales , two selects for locales and second for currency
 
   useEffect(() => {
     getSymbolAndCentsSeparator();
@@ -49,17 +47,26 @@ export const useCurrencyInput = () => {
 
     if (onlySeparator) return (newVal = `0${centsSeparator}`);
 
-    if (separatorIndex + 1 === newVal.length || nextElementAfterSeparator)
-      return newVal;
+    if (separatorIndex + 1 === newVal.length) return newVal;
+
+    if (nextElementAfterSeparator === "0") return newVal;
 
     const formatter = Intl.NumberFormat("en-US");
+    const allowOnlyNumbersAndCents = RegExp(`[^\\d\\${centsSeparator}]`, "g");
 
-    const localizedValue = formatter.format(Number(newVal.replace(/\D/g, "")));
+    const localizedValue = formatter.format(
+      Number(newVal.replace(allowOnlyNumbersAndCents, ""))
+    );
 
     return localizedValue;
   };
 
-  const handleBLur = () => setVal(makeLocaleString(val));
+  const handleBLur = () =>
+    setVal(
+      Intl.NumberFormat("en-US").format(
+        Number(val.replace(RegExp(`[^\\d\\${centsSeparator}]`, "g"), ""))
+      )
+    );
 
   const onChange = ({ target }: React.ChangeEvent<HTMLInputElement>) => {
     const value = target.value;
@@ -76,7 +83,6 @@ export const useCurrencyInput = () => {
     const newVal = value.replace(regex, "");
     const maxLength = newVal.indexOf(centsSeparator) + 4;
     const separatorCount = newVal.match(/\./g);
-
     const doubleGroupSeparator = RegExp(`[\\${groupSeparator}]{2,}`, "g");
 
     if (!!value.match(doubleGroupSeparator)?.length) return;
@@ -96,8 +102,6 @@ export const useCurrencyInput = () => {
     setVal,
     // currency,
     // setCurrency,
-    showMenu,
-    setShowMenu,
     makeLocaleString,
     currencySymbol,
     handleBLur,
