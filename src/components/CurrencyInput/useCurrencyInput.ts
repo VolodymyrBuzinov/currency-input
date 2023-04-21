@@ -1,16 +1,27 @@
-import { useEffect, useState } from "react";
+import { MutableRefObject, useEffect, useRef, useState } from "react";
 
 export const currencies = ["EUR", "JPY", "PLN", "GBP", "CHF", "UAH", "USD"];
 
 export const locales = ["de", "ja-JP", "pl", "en-GB", "uk-UA", "en-US"];
 
-export const useCurrencyInput = () => {
+export const useCurrencyInput = (
+  changeCallback: (v: number) => void,
+  defaultValue?: number
+) => {
   const [locale, setLocale] = useState("en-US");
   const [currency, setCurrency] = useState("USD");
-  const [val, setVal] = useState("0");
   const [centsSeparator, setCentsSeparator] = useState("");
   const [currencySymbol, setCurrencySymbol] = useState("");
   const [groupSeparator, setGroupSeparator] = useState("");
+  const ref: MutableRefObject<HTMLInputElement | null> = useRef(null);
+
+  useEffect(() => {
+    if (!ref.current) return;
+    if (typeof defaultValue !== "number" || isNaN(defaultValue))
+      defaultValue = 0;
+
+    ref.current.value = defaultValue.toString();
+  }, [defaultValue]);
 
   useEffect(() => {
     getSymbolAndCentsSeparator();
@@ -52,17 +63,25 @@ export const useCurrencyInput = () => {
       : localizedValue;
   };
 
-  const handleBLur = () => {
-    const newVal = Number(
+  const makeNumberValue = (val: string) => {
+    return Number(
       val
         .replace(RegExp(`[^\\d\\${centsSeparator}]`, "g"), "")
         .replace(RegExp(`\\${centsSeparator}`), ".")
     );
+  };
 
-    setVal(Intl.NumberFormat(locale).format(newVal));
+  const handleBLur = () => {
+    // const newVal = Number(
+    //   val
+    //     .replace(RegExp(`[^\\d\\${centsSeparator}]`, "g"), "")
+    //     .replace(RegExp(`\\${centsSeparator}`), ".")
+    // );
+    // setVal(Intl.NumberFormat(locale).format(newVal));
   };
 
   const onChange = ({ target }: React.ChangeEvent<HTMLInputElement>) => {
+    if (!ref.current) return;
     let value = target.value;
 
     const selectionStart = target.selectionStart;
@@ -70,13 +89,15 @@ export const useCurrencyInput = () => {
     if (value.length !== selectionEnd)
       window.requestAnimationFrame(() => {
         target.selectionStart = selectionStart;
-        target.selectionEnd = selectionStart;
+        target.selectionEnd = selectionStart || 0 + 1;
       });
 
     const regex = RegExp(`[^\\d\\${centsSeparator}\\${groupSeparator}]`, "g");
     const dotsCount = value.replace(RegExp(`[^\\${centsSeparator}]`, "g"), "");
     const splittedVal = value.split(`${centsSeparator}`);
     const symbolsAfterDot = splittedVal?.[1];
+
+    console.log(regex.test(value));
 
     if (regex.test(value) || dotsCount.length > 1) return;
 
@@ -86,13 +107,13 @@ export const useCurrencyInput = () => {
         centsSeparator +
         symbolsAfterDot.slice(0, 2);
 
-    setVal(value);
+    changeCallback(makeNumberValue(value));
+
+    ref.current.value = makeLocaleString(value);
   };
 
   return {
     onChange,
-    val,
-    setVal,
     makeLocaleString,
     currencySymbol,
     handleBLur,
@@ -100,5 +121,6 @@ export const useCurrencyInput = () => {
     setLocale,
     currency,
     setCurrency,
+    ref,
   };
 };

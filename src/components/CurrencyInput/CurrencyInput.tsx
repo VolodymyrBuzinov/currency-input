@@ -1,18 +1,25 @@
 import { FC } from "react";
 import { currencies, locales, useCurrencyInput } from "./useCurrencyInput";
 
-export const CurrencyInput: FC = () => {
+interface iCurrencyInput {
+  changeCallback: (v: number) => void;
+  defaultValue?: number;
+}
+
+export const CurrencyInput: FC<iCurrencyInput> = ({
+  changeCallback,
+  defaultValue,
+}) => {
   const {
-    val,
     onChange,
-    makeLocaleString,
     currencySymbol,
     handleBLur,
     setLocale,
     locale,
     currency,
     setCurrency,
-  } = useCurrencyInput();
+    ref,
+  } = useCurrencyInput(changeCallback, defaultValue);
 
   return (
     <div className="CurrencyInput-wrap">
@@ -46,7 +53,7 @@ export const CurrencyInput: FC = () => {
       <div className="CurrencyInput-content">
         <p className="CurrencyInput-symbol">{currencySymbol}</p>
         <input
-          value={makeLocaleString(val)}
+          ref={ref}
           className="CurrencyInput"
           type="text"
           onChange={onChange}
