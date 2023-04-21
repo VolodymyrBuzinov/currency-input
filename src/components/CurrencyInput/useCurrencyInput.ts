@@ -22,7 +22,7 @@ export const useCurrencyInput = () => {
 
   useEffect(() => {
     getSymbolAndCentsSeparator();
-  }, [currency]);
+  }, [currency, locale]);
 
   const getSymbolAndCentsSeparator = () => {
     const formatter = new Intl.NumberFormat(locale, {

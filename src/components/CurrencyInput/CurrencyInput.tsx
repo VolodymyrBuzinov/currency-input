@@ -14,7 +14,9 @@ export const CurrencyInput: FC = () => {
 
   return (
     <div className="CurrencyInput-wrap">
+      <span>Locale</span>
       <select
+        className="CurrencyInput-locale"
         name="locale"
         onChange={({ target: { value } }) => setLocale(value)}
       >
@@ -24,7 +26,9 @@ export const CurrencyInput: FC = () => {
           </option>
         ))}
       </select>
+      <span className="CurrencyInput-label">Currency</span>
       <select
+        className="CurrencyInput-currency"
         name="currency"
         onChange={({ target: { value } }) => setCurrency(value)}
       >
