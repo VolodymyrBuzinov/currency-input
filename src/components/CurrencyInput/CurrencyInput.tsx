@@ -9,6 +9,8 @@ export const CurrencyInput: FC = () => {
     currencySymbol,
     handleBLur,
     setLocale,
+    locale,
+    currency,
     setCurrency,
   } = useCurrencyInput();
 
@@ -18,11 +20,12 @@ export const CurrencyInput: FC = () => {
       <select
         className="CurrencyInput-locale"
         name="locale"
+        value={locale}
         onChange={({ target: { value } }) => setLocale(value)}
       >
-        {locales.map((locale) => (
-          <option key={locale} value={locale}>
-            {locale}
+        {locales.map((localeItem) => (
+          <option key={localeItem} value={localeItem}>
+            {localeItem}
           </option>
         ))}
       </select>
@@ -30,11 +33,12 @@ export const CurrencyInput: FC = () => {
       <select
         className="CurrencyInput-currency"
         name="currency"
+        value={currency}
         onChange={({ target: { value } }) => setCurrency(value)}
       >
-        {currencies.map((currency) => (
-          <option key={currency} value={currency}>
-            {currency}
+        {currencies.map((currencyItem) => (
+          <option key={currencyItem} value={currencyItem}>
+            {currencyItem}
           </option>
         ))}
       </select>

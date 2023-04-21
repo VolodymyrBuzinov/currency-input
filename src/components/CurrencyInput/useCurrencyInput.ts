@@ -2,15 +2,7 @@ import { useEffect, useState } from "react";
 
 export const currencies = ["EUR", "JPY", "PLN", "GBP", "CHF", "UAH", "USD"];
 
-export const locales = [
-  "de",
-  "ja-JP",
-  "pl",
-  "en-GB",
-  "fr-CH",
-  "uk-UA",
-  "en-US",
-];
+export const locales = ["de", "ja-JP", "pl", "en-GB", "uk-UA", "en-US"];
 
 export const useCurrencyInput = () => {
   const [locale, setLocale] = useState("en-US");
@@ -63,9 +55,10 @@ export const useCurrencyInput = () => {
   const handleBLur = () => {
     const newVal = Number(
       val
+        .replace(RegExp(`[^\\d\\${centsSeparator}]`, "g"), "")
         .replace(RegExp(`\\${centsSeparator}`), ".")
-        .replace(RegExp(`[^\\d\\.]`, "g"), "")
     );
+
     setVal(Intl.NumberFormat(locale).format(newVal));
   };
 
