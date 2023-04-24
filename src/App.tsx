@@ -7,7 +7,7 @@ function App() {
   };
   return (
     <div className="App">
-      <CurrencyInput changeCallback={changeCallback} defaultValue={{} as any} />
+      <CurrencyInput changeCallback={changeCallback} />
     </div>
   );
 }

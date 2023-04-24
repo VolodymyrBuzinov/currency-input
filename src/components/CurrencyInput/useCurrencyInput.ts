@@ -13,14 +13,13 @@ export const useCurrencyInput = (
   const [centsSeparator, setCentsSeparator] = useState("");
   const [currencySymbol, setCurrencySymbol] = useState("");
   const [groupSeparator, setGroupSeparator] = useState("");
-  const ref: MutableRefObject<HTMLInputElement | null> = useRef(null);
+  const [val, setVal] = useState("0");
 
   useEffect(() => {
-    if (!ref.current) return;
     if (typeof defaultValue !== "number" || isNaN(defaultValue))
       defaultValue = 0;
 
-    ref.current.value = defaultValue.toString();
+    setVal(defaultValue.toString());
   }, [defaultValue]);
 
   useEffect(() => {
@@ -40,6 +39,8 @@ export const useCurrencyInput = (
     });
   };
 
+  const cutAllButDigits = (val: string) => val.replace(/\D/g, "");
+
   const makeLocaleString = (val: string) => {
     let newVal = val;
     const separatorIndex = newVal.indexOf(centsSeparator);
@@ -52,7 +53,7 @@ export const useCurrencyInput = (
     const formatter = Intl.NumberFormat(locale);
 
     const localizedValue = formatter.format(
-      Number(splittedVal?.[0].replace(/\D/g, ""))
+      Number(cutAllButDigits(splittedVal?.[0]))
     );
 
     if (!symbolsAfterDot && separatorIndex >= 1)
@@ -80,36 +81,36 @@ export const useCurrencyInput = (
     // setVal(Intl.NumberFormat(locale).format(newVal));
   };
 
-  const onChange = ({ target }: React.ChangeEvent<HTMLInputElement>) => {
-    if (!ref.current) return;
-    let value = target.value;
+  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let value = e.target.value;
+    const target = e.target;
 
-    const selectionStart = target.selectionStart;
+    const selectionStart = target.selectionStart || 0 - 1;
     const selectionEnd = target.selectionEnd;
     if (value.length !== selectionEnd)
       window.requestAnimationFrame(() => {
         target.selectionStart = selectionStart;
-        target.selectionEnd = selectionStart || 0 + 1;
+        target.selectionEnd = selectionStart;
       });
 
     const regex = RegExp(`[^\\d\\${centsSeparator}\\${groupSeparator}]`, "g");
     const dotsCount = value.replace(RegExp(`[^\\${centsSeparator}]`, "g"), "");
     const splittedVal = value.split(`${centsSeparator}`);
     const symbolsAfterDot = splittedVal?.[1];
+    const valueLength = cutAllButDigits(splittedVal?.[0]).length;
 
-    console.log(regex.test(value));
+    if (regex.test(value) || dotsCount.length > 1 || valueLength >= 13) return;
 
-    if (regex.test(value) || dotsCount.length > 1) return;
-
-    if (!!symbolsAfterDot && symbolsAfterDot?.length > 2)
+    if (!!symbolsAfterDot) {
       value =
-        splittedVal?.[0].replace(/\D/g, "") +
+        cutAllButDigits(splittedVal?.[0]) +
         centsSeparator +
-        symbolsAfterDot.slice(0, 2);
+        cutAllButDigits(symbolsAfterDot).slice(0, 2);
+    }
 
     changeCallback(makeNumberValue(value));
 
-    ref.current.value = makeLocaleString(value);
+    setVal(makeLocaleString(value));
   };
 
   return {
@@ -121,6 +122,6 @@ export const useCurrencyInput = (
     setLocale,
     currency,
     setCurrency,
-    ref,
+    val,
   };
 };

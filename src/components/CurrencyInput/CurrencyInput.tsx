@@ -18,7 +18,7 @@ export const CurrencyInput: FC<iCurrencyInput> = ({
     locale,
     currency,
     setCurrency,
-    ref,
+    val,
   } = useCurrencyInput(changeCallback, defaultValue);
 
   return (
@@ -53,7 +53,8 @@ export const CurrencyInput: FC<iCurrencyInput> = ({
       <div className="CurrencyInput-content">
         <p className="CurrencyInput-symbol">{currencySymbol}</p>
         <input
-          ref={ref}
+          autoFocus
+          value={val}
           className="CurrencyInput"
           type="text"
           onChange={onChange}
