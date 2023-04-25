@@ -1,4 +1,4 @@
-import { MutableRefObject, useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 export const currencies = ["EUR", "JPY", "PLN", "GBP", "CHF", "UAH", "USD"];
 
@@ -85,7 +85,7 @@ export const useCurrencyInput = (
     let value = e.target.value;
     const target = e.target;
 
-    const selectionStart = target.selectionStart || 0 - 1;
+    const selectionStart = target.selectionStart || 0 + 1;
     const selectionEnd = target.selectionEnd;
     if (value.length !== selectionEnd)
       window.requestAnimationFrame(() => {
@@ -99,7 +99,9 @@ export const useCurrencyInput = (
     const symbolsAfterDot = splittedVal?.[1];
     const valueLength = cutAllButDigits(splittedVal?.[0]).length;
 
-    if (regex.test(value) || dotsCount.length > 1 || valueLength >= 13) return;
+    if (regex.test(value) || dotsCount.length > 1) return;
+
+    if (valueLength > 12) return;
 
     if (!!symbolsAfterDot) {
       value =
