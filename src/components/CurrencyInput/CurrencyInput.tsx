@@ -1,27 +1,18 @@
-import { FC } from "react";
+import { FC, InputHTMLAttributes } from "react";
 
-interface iCurrencyInput {
-  value: string;
-  changeCallback: (e: React.ChangeEvent<HTMLInputElement>) => void;
+interface iCurrencyInput extends InputHTMLAttributes<HTMLInputElement> {
   currencySymbol: string;
 }
 
 export const CurrencyInput: FC<iCurrencyInput> = ({
-  changeCallback,
-  value,
   currencySymbol,
+  ...rest
 }) => {
   return (
     <div className="CurrencyInput-wrap">
       <div className="CurrencyInput-content">
         <p className="CurrencyInput-symbol">{currencySymbol}</p>
-        <input
-          autoFocus
-          value={value}
-          className="CurrencyInput"
-          type="text"
-          onChange={changeCallback}
-        />
+        <input {...rest} className="CurrencyInput" type="text" />
       </div>
     </div>
   );

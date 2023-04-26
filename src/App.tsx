@@ -3,12 +3,15 @@ import "assets/index.scss";
 import { useCurrencyInput } from "components/CurrencyInput/useCurrencyInput";
 
 function App() {
-  const { val, onChange, currencySymbol } = useCurrencyInput();
+  const { val, onChange, currencySymbol, onBlur } = useCurrencyInput({
+    defaultValue: 111111111111 as any,
+  });
 
   return (
     <div className="App">
       <CurrencyInput
-        changeCallback={onChange}
+        onChange={onChange}
+        onBlur={onBlur}
         value={val}
         currencySymbol={currencySymbol}
       />

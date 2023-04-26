@@ -1,11 +1,25 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-export const useCurrencyInput = () => {
+interface iUseCurrencyInput {
+  defaultValue?: number;
+}
+
+export const useCurrencyInput = ({ defaultValue }: iUseCurrencyInput) => {
   const centsSeparator = ".";
   const currencySymbol = "$";
   const groupSeparator = ",";
   const [val, setVal] = useState("0");
   const [numericVal, setNumericVal] = useState(0);
+
+  useEffect(() => {
+    if (!defaultValue) return;
+    const validNumber = !isNaN(defaultValue) && !Array.isArray(defaultValue);
+    const newVal = validNumber
+      ? makeLocaleString(defaultValue.toString())
+      : "0";
+    setVal(newVal);
+    setNumericVal(makeNumberValue(newVal));
+  }, []);
 
   const cutAllButDigits = (val: string) => val.replace(/\D/g, "");
 
@@ -52,6 +66,8 @@ export const useCurrencyInput = () => {
     });
   };
 
+  const onBlur = () => setVal(Intl.NumberFormat("en-US").format(numericVal));
+
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let value = e.target.value;
     const target = e.target;
@@ -88,5 +104,6 @@ export const useCurrencyInput = () => {
     currencySymbol,
     val,
     numericVal,
+    onBlur,
   };
 };
