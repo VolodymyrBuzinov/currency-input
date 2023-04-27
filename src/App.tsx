@@ -3,9 +3,7 @@ import "assets/index.scss";
 import { useCurrencyInput } from "components/CurrencyInput/useCurrencyInput";
 
 function App() {
-  const { val, onChange, currencySymbol, onBlur } = useCurrencyInput({
-    defaultValue: 111111111111 as any,
-  });
+  const { val, onChange, currencySymbol, onBlur } = useCurrencyInput({});
 
   return (
     <div className="App">

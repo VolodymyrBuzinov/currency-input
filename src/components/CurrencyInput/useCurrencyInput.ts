@@ -10,6 +10,7 @@ export const useCurrencyInput = ({ defaultValue }: iUseCurrencyInput) => {
   const groupSeparator = ",";
   const [val, setVal] = useState("0");
   const [numericVal, setNumericVal] = useState(0);
+  console.log(numericVal);
 
   useEffect(() => {
     if (!defaultValue) return;
@@ -47,11 +48,14 @@ export const useCurrencyInput = ({ defaultValue }: iUseCurrencyInput) => {
   };
 
   const makeNumberValue = (val: string) => {
-    return Number(
-      val
-        .replace(RegExp(`[^\\d\\${centsSeparator}]`, "g"), "")
-        .replace(RegExp(`\\${centsSeparator}`), ".")
-    );
+    const onlySeparator = val === ".";
+    return onlySeparator
+      ? 0
+      : Number(
+          val
+            .replace(RegExp(`[^\\d\\${centsSeparator}]`, "g"), "")
+            .replace(RegExp(`\\${centsSeparator}`), ".")
+        );
   };
 
   const setCursorPosition = (
@@ -91,7 +95,9 @@ export const useCurrencyInput = ({ defaultValue }: iUseCurrencyInput) => {
     setVal((pv) => {
       setCursorPosition(
         target,
-        Number(makeLocaleString(value).length - pv.length >= 2)
+        value === "."
+          ? 1
+          : Number(makeLocaleString(value).length - pv.length >= 2)
       );
 
       return makeLocaleString(value);
