@@ -3,7 +3,10 @@ import "assets/index.scss";
 import { useCurrencyInput } from "components/CurrencyInput/useCurrencyInput";
 
 function App() {
-  const { val, onChange, currencySymbol, onBlur } = useCurrencyInput({});
+  const { val, onChange, onBlur } = useCurrencyInput({
+    centsSeparator: ".",
+    groupSeparator: " ",
+  });
 
   return (
     <div className="App">
@@ -11,7 +14,7 @@ function App() {
         onChange={onChange}
         onBlur={onBlur}
         value={val}
-        currencySymbol={currencySymbol}
+        currencySymbol={"$"}
       />
     </div>
   );

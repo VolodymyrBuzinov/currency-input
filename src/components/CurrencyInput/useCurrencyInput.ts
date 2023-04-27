@@ -2,15 +2,20 @@ import { useEffect, useState } from "react";
 
 interface iUseCurrencyInput {
   defaultValue?: number;
+  centsSeparator?: string;
+  groupSeparator?: string;
 }
 
-export const useCurrencyInput = ({ defaultValue }: iUseCurrencyInput) => {
-  const centsSeparator = ".";
-  const currencySymbol = "$";
-  const groupSeparator = ",";
+const defaultCentSeparator = ".";
+const defaultGroupSeparator = ",";
+
+export const useCurrencyInput = ({
+  defaultValue,
+  centsSeparator = defaultCentSeparator,
+  groupSeparator = defaultGroupSeparator,
+}: iUseCurrencyInput) => {
   const [val, setVal] = useState("0");
   const [numericVal, setNumericVal] = useState(0);
-  console.log(numericVal);
 
   useEffect(() => {
     if (!defaultValue) return;
@@ -24,6 +29,14 @@ export const useCurrencyInput = ({ defaultValue }: iUseCurrencyInput) => {
 
   const cutAllButDigits = (val: string) => val.replace(/\D/g, "");
 
+  const localizeValueAndReplaceDelimeters = (val: number) => {
+    const formatter = Intl.NumberFormat("en-US");
+    return formatter
+      .format(val)
+      .replaceAll(",", groupSeparator)
+      .replace(".", centsSeparator);
+  };
+
   const makeLocaleString = (val: string) => {
     let newVal = val;
     const separatorIndex = newVal.indexOf(centsSeparator);
@@ -33,9 +46,7 @@ export const useCurrencyInput = ({ defaultValue }: iUseCurrencyInput) => {
 
     if (onlySeparator) return `0${centsSeparator}`;
 
-    const formatter = Intl.NumberFormat("en-US");
-
-    const localizedValue = formatter.format(
+    const localizedValue = localizeValueAndReplaceDelimeters(
       Number(cutAllButDigits(splittedVal?.[0]))
     );
 
@@ -48,7 +59,7 @@ export const useCurrencyInput = ({ defaultValue }: iUseCurrencyInput) => {
   };
 
   const makeNumberValue = (val: string) => {
-    const onlySeparator = val === ".";
+    const onlySeparator = val === centsSeparator;
     return onlySeparator
       ? 0
       : Number(
@@ -70,7 +81,7 @@ export const useCurrencyInput = ({ defaultValue }: iUseCurrencyInput) => {
     });
   };
 
-  const onBlur = () => setVal(Intl.NumberFormat("en-US").format(numericVal));
+  const onBlur = () => setVal(localizeValueAndReplaceDelimeters(numericVal));
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let value = e.target.value;
@@ -95,7 +106,7 @@ export const useCurrencyInput = ({ defaultValue }: iUseCurrencyInput) => {
     setVal((pv) => {
       setCursorPosition(
         target,
-        value === "."
+        value === centsSeparator
           ? 1
           : Number(makeLocaleString(value).length - pv.length >= 2)
       );
@@ -107,7 +118,6 @@ export const useCurrencyInput = ({ defaultValue }: iUseCurrencyInput) => {
   return {
     onChange,
     makeLocaleString,
-    currencySymbol,
     val,
     numericVal,
     onBlur,
