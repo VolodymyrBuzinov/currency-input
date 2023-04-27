@@ -9,6 +9,14 @@ interface iUseCurrencyInput {
 const defaultCentSeparator = ".";
 const defaultGroupSeparator = ",";
 
+/**
+ * Custom currency input hook
+ * @param {number} defaultValue default input value in number format
+ * @param {string} centsSeparator a string to separate cents
+ * @param {string} groupSeparator a string to separate dozens, hundreds, thousands, millions etc.
+ * @returns {object}  {onChange,val, numericVal, onBlur} input state management methods
+ */
+
 export const useCurrencyInput = ({
   defaultValue,
   centsSeparator = defaultCentSeparator,
@@ -16,6 +24,10 @@ export const useCurrencyInput = ({
 }: iUseCurrencyInput) => {
   const [val, setVal] = useState("0");
   const [numericVal, setNumericVal] = useState(0);
+
+  /**
+   * Effect is checking defaultValue prop validity and set valid values
+   */
 
   useEffect(() => {
     if (!defaultValue) return;
@@ -27,9 +39,21 @@ export const useCurrencyInput = ({
     setNumericVal(makeNumberValue(newVal));
   }, []);
 
-  const cutAllButDigits = (val: string) => val.replace(/\D/g, "");
+  /**
+   * Filters all except numbers
+   * @param {string} val - string to filter
+   * @return {string} - filtered string
+   */
 
-  const localizeValueAndReplaceDelimeters = (val: number) => {
+  const cutAllButDigits = (val: string): string => val.replace(/\D/g, "");
+
+  /**
+   * Localizes numeric value and change default delimeters to delimeters from props
+   * @param {number} val - number to localize
+   * @return {string} - localized string
+   */
+
+  const localizeValueAndReplaceDelimeters = (val: number): string => {
     const formatter = Intl.NumberFormat("en-US");
     return formatter
       .format(val)
@@ -37,7 +61,13 @@ export const useCurrencyInput = ({
       .replace(".", centsSeparator);
   };
 
-  const makeLocaleString = (val: string) => {
+  /**
+   * Makes locale string to show visually changed value in the input
+   * @param {string} val - string to localize
+   * @return {string} - localized string
+   */
+
+  const makeLocaleString = (val: string): string => {
     let newVal = val;
     const separatorIndex = newVal.indexOf(centsSeparator);
     const onlySeparator = separatorIndex === 0 && newVal.length === 1;
@@ -58,7 +88,13 @@ export const useCurrencyInput = ({
       : localizedValue;
   };
 
-  const makeNumberValue = (val: string) => {
+  /**
+   * Makes numeric value from the localized value
+   * @param {string} val - string to make a number
+   * @return {number}
+   */
+
+  const makeNumberValue = (val: string): number => {
     const onlySeparator = val === centsSeparator;
     return onlySeparator
       ? 0
@@ -68,6 +104,12 @@ export const useCurrencyInput = ({
             .replace(RegExp(`\\${centsSeparator}`), ".")
         );
   };
+
+  /**
+   * Sets a caret position in the input
+   * @param {object} target - HTML Dom Element
+   * @param {step} number - step for moving caret position
+   */
 
   const setCursorPosition = (
     target: EventTarget & HTMLInputElement,
@@ -81,7 +123,16 @@ export const useCurrencyInput = ({
     });
   };
 
+  /**
+   * Localizes and sets the numeric value in the input
+   */
+
   const onBlur = () => setVal(localizeValueAndReplaceDelimeters(numericVal));
+
+  /**
+   * Handles input value changes
+   * @param {object} e - React Change Event instance
+   */
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let value = e.target.value;
@@ -117,7 +168,6 @@ export const useCurrencyInput = ({
 
   return {
     onChange,
-    makeLocaleString,
     val,
     numericVal,
     onBlur,
