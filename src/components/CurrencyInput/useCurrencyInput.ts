@@ -113,13 +113,17 @@ export const useCurrencyInput = ({
 
   const setCursorPosition = (
     target: EventTarget & HTMLInputElement,
-    step?: number
+    step: number
   ) => {
+    let newStep = step;
     target.selectionDirection = "forward";
+    if (target.value.length === 1) newStep = 2;
+    const isNegative = newStep < 0;
     const selectionStart = target.selectionStart || 0;
+    const newVal = isNegative ? selectionStart - 1 : selectionStart + 1;
     window.requestAnimationFrame(() => {
-      target.selectionStart = !!step ? selectionStart + step : selectionStart;
-      target.selectionEnd = !!step ? selectionStart + step : selectionStart;
+      target.selectionStart = Math.abs(newStep) > 1 ? newVal : selectionStart;
+      target.selectionEnd = Math.abs(newStep) > 1 ? newVal : selectionStart;
     });
   };
 
@@ -155,13 +159,7 @@ export const useCurrencyInput = ({
     setNumericVal(makeNumberValue(value));
 
     setVal((pv) => {
-      setCursorPosition(
-        target,
-        value === centsSeparator
-          ? 1
-          : Number(makeLocaleString(value).length - pv.length >= 2)
-      );
-
+      setCursorPosition(target, makeLocaleString(value).length - pv.length);
       return makeLocaleString(value);
     });
   };
